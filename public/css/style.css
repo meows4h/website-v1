@@ -1,0 +1,111 @@
+html {
+    display: table;
+    margin: auto;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    background-color: rgb(230, 230, 230);
+}
+
+body {
+    padding-top: 65px;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+h1 {
+    text-align: center;
+}
+
+nav {
+    text-align: center;
+}
+
+table {
+    border-collapse: collapse;
+    margin: auto;
+}
+
+p {
+    text-align: center;
+}
+
+fieldset {
+    padding: 16px;
+    margin-bottom: 10px;
+    background-color: white;
+    border-style: double;
+    border-width: 5px;
+}
+
+fieldset p {
+    text-align: left;
+    margin: 0;
+    padding-bottom: 5px;
+}
+
+th {
+    color: white;
+    background-color: rgb(54, 55, 68);
+    padding: 10px;
+}
+
+th a {
+    color: rgb(169, 199, 255);
+}
+
+th a:hover {
+    color: white;
+    cursor: pointer;
+}
+
+td {
+    color: black;
+    background-color: rgb(238, 238, 238);
+}
+
+td a {
+    color: rgb(91, 134, 212)
+}
+
+a {
+    color: rgb(91, 134, 212);
+    text-decoration: none;
+}
+
+a:hover {
+    color:black;
+    cursor: pointer;
+}
+
+button {
+    color: rgb(54, 55, 68);
+    background-color: white;
+}
+
+button:hover {
+    color:rgb(54, 55, 68);
+    background-color: rgb(235, 235, 235);
+}
+
+input {
+    color: rgb(54, 55, 68);
+    background-color: white;
+}
+
+input:hover {
+    color:rgb(54, 55, 68);
+    background-color: rgb(235, 235, 235);
+}
+
+.active {
+    color: black;
+    font-weight: bold;
+}
+
+#home.page_description {
+    font-size: 20px;
+}
+
+page_description {
+    margin: 20px;
+    font-size: 17px;
+}
