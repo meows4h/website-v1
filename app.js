@@ -18,9 +18,17 @@ app.set('view engine', '.hbs');                 // Tell express to use the handl
 // ROUTES
 
 // Get page
+
+// Index
 app.get('/', function(req, res)
 {
     return res.render('index');
+})
+
+// Portfolio
+app.get('/portfolio', function(req, res)
+{
+    return res.render('portfolio');
 })
 
 app.listen(PORT, function(){            // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
