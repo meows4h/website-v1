@@ -6,7 +6,7 @@ var app     = express();            // We need to instantiate an express object 
 app.use(express.json());            // JSON parsing
 app.use(express.urlencoded({extended: true}));
 app.use(express.static('public'));  // Setting directory
-PORT        = 13672;                // Port number
+PORT        = 13670;                // Port number
 
 // Handlebars
 const { engine } = require('express-handlebars');
