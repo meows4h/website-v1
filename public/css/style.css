@@ -6,29 +6,41 @@ body, html {
 }
 
 /* Create a Parallax Effect */
-.bgimg-1, .bgimg-2, .bgimg-3 {
+.bgimg-1, .bgimg-2, .bgimg-3, .bgimg-4, .bgimg-5 {
   background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-/* First image (Logo. Full height) */
+/* First image (full page) */
 .bgimg-1 {
   background-image: url('../images/destiny-concept-art.jpg');
   min-height: 100%;
 }
 
-/* Second image (Portfolio) */
+/* Second image */
 .bgimg-2 {
   background-image: url("../images/destiny-concept-art.jpg");
   min-height: 400px;
 }
 
-/* Third image (Contact) */
+/* Third image */
 .bgimg-3 {
   background-image: url("../images/destiny-concept-art.jpg");
   min-height: 400px;
+}
+
+/* Fourth image */
+.bgimg-4 {
+  background-image: url("../images/destiny-concept-art.jpg");
+  min-height: 300px;
+}
+
+/* Fifth image */
+.bgimg-5 {
+  background-image: url("../images/destiny-concept-art.jpg");
+  min-height: 300px;
 }
 
 .nav-background {
@@ -41,7 +53,7 @@ body, html {
 
 /* Turn off parallax scrolling for tablets and phones */
 @media only screen and (max-device-width: 1400px) {
-  .bgimg-1, .bgimg-2, .bgimg-3 {
+  .bgimg-1, .bgimg-2, .bgimg-3, .bgimg-4, .bgimg-5 {
     background-attachment: scroll;
     min-height: 400px;
   }
