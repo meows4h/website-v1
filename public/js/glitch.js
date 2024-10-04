@@ -1,5 +1,10 @@
 // this definitely can be formatted better but it works for what it is worth; wrote this for my old website
 
+// async wait
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 var swapped = false;
 var glitch_chars = ['$', '%', '&', '*', '@', '!', '+', '=', '#', '?', '>', '<', 'x'];
 
