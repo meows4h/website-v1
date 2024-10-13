@@ -2,10 +2,21 @@
 // this code is incredibly inefficient but i honestly have 0 clue as to how i would at all truncate all these
 // 'if this condition then this outcome' type mechanics for this phase into nice for loops
 
+/* map for relevant phase 4 positions that i will be using as code
+
+   12o   6o   7o                         18o
+         2o                              14o
+ 11o 5o (1o) 3o         21o         17o (13o) 15o 19o
+         4o                              16o
+   10o   9o   8o        0o               20o
+         
+*/
+
 // player character role
 var role_type = 0; // 0 for dps, 1 for supp
 var role_category = 1; // 0 for melee, 1 for ranged
 var role_position = 1; // position type as it pertains to raid plan, 1 or 2 (0 = 1, 1 = 2)
+var role_idx = 0; // see orders array comment
 
 // i.e. a player with type 1, category 0, position 0, is main tank for 'support melee pos1' whereas 0,1,1 is typically caster, but any ranged dps works, the r2 position
 
@@ -14,14 +25,28 @@ var stage = 0; // stage means at what step is the mechanic
 var failed = false; // disables evaluation and progressing screen when true
 var chain_type = 0; // 1 for red, 2 for blue
 
-var dives_position = 0; // 0 -> inside eye, 1-4 cw starting N
-var first_hit = 0; // 0 no hit, 1 cw-first, 2, ccw-first
+// var dives_position = 0; // 0 -> inside eye, 1-4 cw starting N
+// var first_hit = 0; // 0 no hit, 1 cw-first, 2, ccw-first
+var player_position = 0; // tracks current loc (for dives)
+var player_cw_most = 0; // 0 n/a, 1 cw, 2 ccw
+var player_correct = 0; // tracks correct option for dives
+
+// desired positions - ordered: (0) m1, (1) m2, (2) r1, (3) r2, (4) mt, (5) ot, (6) h1, (7) h2
+var static_order = [[5,5,2,4,15,15,14,16], // pre-pos
+                    [11,11,2,4,19,19,14,16], // popping 1
+                    [2,4,2,4,14,16,14,16], // swaps
+                    [0,0,6,9,0,0,18,20], // popping 2 (refer to away order for finding valid melee)
+                    [1,1,12,10,1,1,7,8]]; // dives preposition
+var away_order = [2,4,6,9,14,16,18,20]; // where melees should NOT be for pop 2
+var dives_order = [];
 
 // general use functions
 function game_reset() {
     stage = 0;
     failed = false;
     chain_type = 0;
+    player_position = 0;
+
 }
 
 // selection functions
@@ -30,6 +55,19 @@ function change_role(type, category) {
     
     role_type = type;
     role_category = category;
+    role_idx = 0;
+
+    if (type == 1) {
+        role_idx += 4;
+    }
+
+    if (category == 1) {
+        role_idx += 2;
+    }
+
+    if (role_position == 1) {
+        role_idx += 1;
+    }
 
 }
 
@@ -38,17 +76,14 @@ function position_swap() {
 
     if (role_position == 0) {
         role_position = 1;
+        role_idx += 1;
     }
 
     else if (role_position == 1) {
         role_position = 0;
-    }
-
-    else {
-        role_position = 0;
+        role_idx -= 1;
     }
 }
-
 
 // gameplay functions
 // swaps chain type
@@ -71,17 +106,30 @@ function generate_chains() {
 }
 
 // makes decision for dives
-function generate_dive_hits() {
-    
-    possible_hits = [1,2,3,4];
+function generate_dive_hits(is_first) {
 
-    let random_int = Math.floor(Math.random * 4);
-    possible_hits.splice(random_int, 1);
+        // make a possible solution algorithm to track where player should go next..?
+        // use combination of current position + role position
+        // this should be able to solve it..?
 
-    random_int = Math.floor(Math.random * 3);
-    possible_hits.splice(random_int, 1);
+        possible_hits = [7,8,10,12]; // spots starting N, going cw
 
-    for (let i = 0; i < possible_hits.length(); i++) {} // this is where i left off
+        let random_int = Math.floor(Math.random * 4);
+        let first_hit = possible_hits[random_int];
+        possible_hits.splice(random_int, 1);
+
+        random_int = Math.floor(Math.random * 3);
+        let second_hit = possible_hits[random_int];
+        possible_hits.splice(random_int, 1);
+
+        // matters the first time to track cw-ness of hits for the players
+        if (is_first == true && role_category == 1) {
+            if (first_hit < second_hit) {
+                player_cw_most = 1;
+            } else {
+                player_cw_most = 2;
+            }
+        }
 }
 
 function evaluate_choice(choice) {
@@ -97,102 +145,38 @@ function evaluate_choice(choice) {
         if (chains == 1) {
             if (role_category == 0) {
                 // dont swap = correct (melee)
+                if (choice == 21) {
+                    failed = true;
+                }
             } else {
                 // swap = correct (ranged)
+                if (choice != 21) {
+                    failed = true;
+                }
+                chain_swap();
             }
 
         // blue chains
         } else if (chains == 2) {
             if (role_category == 0) {
                 // swap = correct (melee)
+                if (choice == 21) {
+                    failed = true;
+                }
             } else {
                 // dont swap = correct (ranged)
+                if (choice != 21) {
+                    failed = true;
+                }
+                chain_swap();
             }
         }
     }
 
-    // bubbles positioning
-    if (stage == 1) {
-
-        if (role_category == 0) { // melee
-            if (role_type == 0) { // dps
-                // left orb (blue eye orb)
-            }
-            else { // tank
-                // right orb (red eye orb)
-            }
-        }
-    
-        else { // ranged
-            if (role_type == 0) { // dps
-                if (role_position == 0) { // r1
-                    // NW orb
-                }
-                else { // r2
-                    // SW orb
-                }
-            }
-            else { // healer
-                if (role_position == 0) { // h1
-                    // NE orb
-                }
-                else { // h2
-                    // SE orb
-                }
-            }
-        }
-    }
-
-    // bubble pop (melee)
-    if (stage == 2) {
-
-        if (role_category == 0) { // melee
-            if (role_type == 0) { // melee dps
-                // inside left orb (blue eye orb)
-            }
-            else { // tank
-                // inside right orb (red eye orb)
-            }
-        }
-    
-        else { // ranged (staying in place)
-            if (role_type == 0) { // phys + caster
-                if (role_position == 0) { // r1
-                    // NW orb
-                }
-                else { // r2
-                    // SW orb
-                }
-            }
-            else { // healer
-                if (role_position == 0) { // h1
-                    // NE orb
-                }
-                else { // h2
-                    // SE orb
-                }
-            }
-        }
-    }
-
-    // chain swaps
-    if (stage == 3) {
-
-        if (role_type == 0) { // dps
-            if (role_position == 0) { // m1 + r1
-                // NW orb
-            }
-            else { // m2 + r2
-                // SW orb
-            }
-        }
-        else { // supports
-            if (role_position == 0) { // mt (t1) + h1
-                // NE orb
-            }
-            else { // ot (t2) + h2
-                // SE orb
-            }
+    // bubbles positioning + bubble pop (melee) + chain swaps
+    if (1 <= stage <= 3) {
+        if (choice != static_order[stage-1][role_idx]) {
+            failed = true;
         }
     }
 
@@ -200,52 +184,30 @@ function evaluate_choice(choice) {
     if (stage == 4) {
 
         if (role_category == 1) { // ranged
-            if (role_type == 0) { // phys + caster
-                if (role_position == 0) { // r1
-                    // inside NW orb
-                }
-                else { // r2
-                    // inside SW orb
-                }
+
+            if (choice != static_order[stage-1][role_idx]) {
+                failed = true;
             }
-            else { // healers
-                if (role_position == 0) { // h1
-                    // inside NE orb
-                }
-                else { // h2
-                    // inside SE orb
-                }
-            }
+
         }
         else { // melee
-            // just somewhere NOT near orbs for this...
-        }
 
+            for (let i = 0; i < away_order.length(); i++) {
+                if (choice == away_order[i]) {
+                    failed = true;
+                }
+            }
+
+        }
     }
 
     // dives positioning
     if (stage == 5) {
-
-        if (role_category == 1) { // ranged
-            if (role_type == 0) { // phys + caster
-                if (role_position == 0) { // r1
-                    // NW of eye
-                }
-                else { // r2
-                    // SW of eye
-                }
-            }
-            else { // healers
-                if (role_position == 0) { // h1
-                    // NE of eye
-                }
-                else { // h2
-                    // SE of eye
-                }
-            }
-        }
-        else { // melee
-            // inside blue eye
+        if (choice != static_order[stage-1][role_idx]) {
+            failed = true;
+        } else {
+            player_position = choice;
+            generate_dive_hits(true);
         }
 
     }
@@ -275,5 +237,8 @@ function evaluate_choice(choice) {
     }
 
     stage += 1;
+    // if (failed == false) {
+    //     player_position = choice;
+    // }
 
 }
